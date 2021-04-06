@@ -32,4 +32,4 @@ jobs:
       with:
         app-name: 'miracleiWeb'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7f43690ab2054505844582878c18e108 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7554d4aa15654564b142f6d128963cfd }}
