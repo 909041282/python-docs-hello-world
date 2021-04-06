@@ -1,87 +1,115 @@
 import os
 import re
+import copy
+
+
 class Question:
 
-    def __init__(self,num):
+    def __init__(self, num):
         self.number = num
 
-    def setQuestion(self,content):
-        data=content.split('\n')
-        if len(data) !=5:
-            raise ValueError('题目格式出错：'+content)
-        self.title=data[0]
-        self.answers={
-            'A':data[1][2:],
-            'B':data[2][2:],
-            'C':data[3][2:],
-            'D':data[4][2:],
+    def setQuestion(self, content):
+        data = content.split('\n')
+        if len(data) != 5:
+            raise ValueError('题目格式出错：' + content)
+        self.title = data[0]
+        self.answers = {
+            'A': data[1][2:],
+            'B': data[2][2:],
+            'C': data[3][2:],
+            'D': data[4][2:],
         }
 
-    def setAnswer(self,answer):
-        self.ture_answers=answer
+    def setAnswer(self, answer):
+        self.ture_answers = answer
+
+    def getQuestionAndAnswer(self):
+        result = copy.deepcopy(self.answers)
+        result['title']=self.title
+        result['answer'] = self.ture_answers
+        return result
+
 
 class Paper:
 
-    def __init__(self,num,title):
+    def __init__(self, num, title):
         self.num = num
-        self.title=title
-        self.single={}
-        self.mutil={}
+        self.title = title
+        self.questions = {'single':{},'mutil':{}}
 
-    def setQuestions(self,content):
+    def getQuestion(self, type, num):
+        if type not in self.questions and num not in self.questions[type]:
+            raise ValueError(f'题型{type}，')
+        return self.questions[type][num].getQuestionAndAnswer()
+
+    def getQuestionNum(self):
+        return {'single': list(self.questions['single'].keys()),
+                'mutil': list(self.questions['mutil'].keys())}
+
+    def setQuestions(self, content):
         content = content.split('\n\n')
-        single_part = re.split(r'\n(\d+)\.',content[0])[1:]
-        for i in range(0,len(single_part),2):
-            number=single_part[i]
-            self.single[number]=Question(number)
-            self.single[number].setQuestion(single_part[i+1])
+        single_part = re.split(r'\n(\d+)\.', content[0])[1:]
+        for i in range(0, len(single_part), 2):
+            number = int(single_part[i])
+            self.questions['single'][number] = Question(number)
+            self.questions['single'][number].setQuestion(single_part[i + 1])
 
-        mutil_part = re.split(r'\n(\d+)\.',content[1])[1:]
-        for i in range(0,len(mutil_part),2):
-            number=mutil_part[i]
-            self.mutil[number]=Question(number)
-            self.mutil[number].setQuestion(mutil_part[i + 1])
+        mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
+        for i in range(0, len(mutil_part), 2):
+            number = int(mutil_part[i])
+            self.questions['mutil'][number] = Question(number)
+            self.questions['mutil'][number].setQuestion(mutil_part[i + 1])
 
-    def setAnswer(self,content):
+    def setAnswer(self, content):
         content = content.split('\n\n')
-        single_part = re.split(r'\n(\d+)\.',content[0])[1:]
-        for i in range(0,len(single_part),2):
-            number=single_part[i]
-            answer = single_part[i+1].split('\n')[1].split('|')
+        single_part = re.split(r'\n(\d+)\.', content[0])[1:]
+        for i in range(0, len(single_part), 2):
+            number = int(single_part[i])
+            answer = single_part[i + 1].split('\n')[1].split('|')
             answer = [i[0] for i in answer]
-            self.single[number].setAnswer(answer)
+            self.questions['single'][number].setAnswer(answer)
 
-        mutil_part = re.split(r'\n(\d+)\.',content[1])[1:]
-        for i in range(0,len(mutil_part),2):
-            number = mutil_part[i]
-            answer = mutil_part[i+1].split('\n')[1].split('|')
+        mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
+        for i in range(0, len(mutil_part), 2):
+            number = int(mutil_part[i])
+            answer = mutil_part[i + 1].split('\n')[1].split('|')
             answer = [i[0] for i in answer]
-            self.mutil[number].setAnswer(answer)
+            self.questions['mutil'][number].setAnswer(answer)
 
 
 class Papers:
 
-    def __init__(self,dir):
-        self.dir=dir
-        self.questions_path=os.path.join(dir,'题目.txt')
-        self.answer_path=os.path.join(dir,'答案.txt')
-        self.papers={}
+    def __init__(self, dir):
+        self.dir = dir
+        self.questions_path = os.path.join(dir, '题目.txt')
+        self.answer_path = os.path.join(dir, '答案.txt')
+        self.papers = {}
         self.parserQuestion()
         self.parserAnswer()
 
+    def getQuestion(self, paper_name, type, num):
+        if paper_name not in self.papers:
+            raise ValueError(f'试卷 {paper_name} 不存在')
+        return self.papers[paper_name].getQuestion(type, num)
+
+    def getQuestionTitle(self, paper_name):
+        return self.papers[paper_name].title
+
     def parserQuestion(self):
-        data=open(self.questions_path,'r',encoding='utf8').read()
-        papers = re.split(r'JC(\d+)\s*(.*)\n',data)[1:]
-        for i in range(0,len(papers),3):
-            self.papers[papers[i]] = Paper(papers[i],papers[i+1])
+        data = open(self.questions_path, 'r', encoding='utf8').read()
+        papers = re.split(r'JC(\d+)\s*(.*)\n', data)[1:]
+        for i in range(0, len(papers), 3):
+            self.papers[papers[i]] = Paper(papers[i], papers[i + 1])
             self.papers[papers[i]].setQuestions(papers[i + 2])
         pass
 
     def parserAnswer(self):
-        data = open(self.answer_path, 'r',encoding='utf8').read()
-        papers = re.split(r'JC(\d+)(.*)\n',data)[1:]
-        for i in range(0,len(papers),3):
-            self.papers[papers[i]].setAnswer(papers[i+2])
+        data = open(self.answer_path, 'r', encoding='utf8').read()
+        papers = re.split(r'JC(\d+)(.*)\n', data)[1:]
+        for i in range(0, len(papers), 3):
+            self.papers[papers[i]].setAnswer(papers[i + 2])
         pass
 
-Papers('data/心理咨询师/')
+
+papers = Papers('data/心理咨询师/')
+print(papers.getQuestion('01','single',1))
