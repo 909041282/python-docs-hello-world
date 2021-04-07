@@ -95,6 +95,12 @@ class Papers:
     def getQuestionTitle(self, paper_name):
         return self.papers[paper_name].title
 
+    def getAllQuestion(self,paper_name):
+        return self.papers[paper_name].getQuestionNum()
+
+    def getAllPaper(self):
+        return list(self.papers.keys())
+
     def parserQuestion(self):
         data = open(self.questions_path, 'r', encoding='utf8').read()
         papers = re.split(r'JC(\d+)\s*(.*)\n', data)[1:]
@@ -110,6 +116,6 @@ class Papers:
             self.papers[papers[i]].setAnswer(papers[i + 2])
         pass
 
-
-papers = Papers('data/心理咨询师/')
-print(papers.getQuestion('01','single',1))
+if __name__=="__main__":
+    papers = Papers('data/心理咨询师/')
+    print(papers.getQuestion('01','single',1))

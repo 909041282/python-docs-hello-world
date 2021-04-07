@@ -3,6 +3,9 @@ from paper import Papers
 import json
 app = Flask(__name__)
 
+papers = Papers('data/心理咨询师/')
+
+
 @app.route("/")
 def hello():
     return "Hello, World!"
@@ -16,11 +19,16 @@ def index():
 def getQuestion():
     try:
         data=json.loads(request.data)
-        papers = Papers('data/心理咨询师/')
-        result = papers.getQuestion(data['paper_name'],data['type'],data['num'])
+        if data['function']=='allPaper':
+            result = papers.getAllPaper()
+        elif data['function']=='paper':
+            result = papers.getAllQuestion(data['paper_name'])
+        elif data['function']=='question':
+            result = papers.getQuestion(data['paper_name'],data['type'],data['num'])
         return json.dumps(result)
     except:
         abort(500)
+
 
 
 app.run("0.0.0.0",5000)
