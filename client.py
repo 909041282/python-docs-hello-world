@@ -1,10 +1,11 @@
 import json
 import requests
 
-url = 'http://127.0.0.1:5000/'
+remote_url = 'https://miracleiweb.azurewebsites.net/'
+local_url = 'http://127.0.0.1:5000/'
 
 def getUrl(data):
-    ret = requests.get(url+'get_question',data=json.dumps(data))
+    ret = requests.get(remote_url+'get_question',data=json.dumps(data))
     print(json.loads(ret.text))
 
 def getQuestion():
