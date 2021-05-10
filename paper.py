@@ -35,7 +35,7 @@ class Paper:
     def __init__(self, num, title):
         self.num = num
         self.title = title
-        self.questions = {'single':{},'mutil':{}}
+        self.questions = {'单选':{},'多选':{}}
 
     def getQuestion(self, type, num):
         if type not in self.questions and num not in self.questions[type]:
@@ -43,22 +43,22 @@ class Paper:
         return self.questions[type][num].getQuestionAndAnswer()
 
     def getQuestionNum(self):
-        return {'single': list(self.questions['single'].keys()),
-                'mutil': list(self.questions['mutil'].keys())}
+        return {'单选': list(self.questions['单选'].keys()),
+                '多选': list(self.questions['多选'].keys())}
 
     def setQuestions(self, content):
         content = content.split('\n\n')
         single_part = re.split(r'\n(\d+)\.', content[0])[1:]
         for i in range(0, len(single_part), 2):
             number = int(single_part[i])
-            self.questions['single'][number] = Question(number)
-            self.questions['single'][number].setQuestion(single_part[i + 1])
+            self.questions['单选'][number] = Question(number)
+            self.questions['单选'][number].setQuestion(single_part[i + 1])
 
         mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
         for i in range(0, len(mutil_part), 2):
             number = int(mutil_part[i])
-            self.questions['mutil'][number] = Question(number)
-            self.questions['mutil'][number].setQuestion(mutil_part[i + 1])
+            self.questions['多选'][number] = Question(number)
+            self.questions['多选'][number].setQuestion(mutil_part[i + 1])
 
     def setAnswer(self, content):
         content = content.split('\n\n')
@@ -67,14 +67,14 @@ class Paper:
             number = int(single_part[i])
             answer = single_part[i + 1].split('\n')[1].split('|')
             answer = [i[0] for i in answer]
-            self.questions['single'][number].setAnswer(answer)
+            self.questions['单选'][number].setAnswer(answer)
 
         mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
         for i in range(0, len(mutil_part), 2):
             number = int(mutil_part[i])
             answer = mutil_part[i + 1].split('\n')[1].split('|')
             answer = [i[0] for i in answer]
-            self.questions['mutil'][number].setAnswer(answer)
+            self.questions['多选'][number].setAnswer(answer)
 
 
 class Papers:
@@ -92,8 +92,14 @@ class Papers:
             raise ValueError(f'试卷 {paper_name} 不存在')
         return self.papers[paper_name].getQuestion(type, num)
 
+    def getPaperName(self):
+        return sorted(list(self.papers.keys()))
+
     def getQuestionTitle(self, paper_name):
         return self.papers[paper_name].title
+
+    def getQuestionNum(self, paper_name):
+        return self.papers[paper_name].getQuestionNum()
 
     def parserQuestion(self):
         data = open(self.questions_path, 'r', encoding='utf8').read()
@@ -109,7 +115,3 @@ class Papers:
         for i in range(0, len(papers), 3):
             self.papers[papers[i]].setAnswer(papers[i + 2])
         pass
-
-
-papers = Papers('data/心理咨询师/')
-print(papers.getQuestion('01','single',1))
