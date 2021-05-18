@@ -258,6 +258,38 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maxLength">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_jump">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>跳转</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -302,8 +334,8 @@
    <slot>onPreviousClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>597</y>
+     <x>144</x>
+     <y>584</y>
     </hint>
     <hint type="destinationlabel">
      <x>44</x>
@@ -318,8 +350,8 @@
    <slot>onSureClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>335</x>
-     <y>591</y>
+     <x>370</x>
+     <y>584</y>
     </hint>
     <hint type="destinationlabel">
      <x>219</x>
@@ -334,8 +366,8 @@
    <slot>onNextClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>548</x>
-     <y>597</y>
+     <x>554</x>
+     <y>584</y>
     </hint>
     <hint type="destinationlabel">
      <x>417</x>
@@ -391,6 +423,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btn_jump</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onJumpClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>650</x>
+     <y>573</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>603</x>
+     <y>625</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onPreviousClicked()</slot>
@@ -399,5 +447,6 @@
   <slot>onFilesChanged()</slot>
   <slot>onPapersChanged()</slot>
   <slot>onQuestionTypeChanged()</slot>
+  <slot>onJumpClicked()</slot>
  </slots>
 </ui>

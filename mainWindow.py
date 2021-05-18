@@ -4,12 +4,13 @@ from PyQt5 import QtWidgets, QtCore
 from ui.main import Ui_MainWindow
 from paper import Papers
 import os, sys
-
+import traceback
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+        self.setWindowTitle('刷题 v1.0')
         self.current_question_num = 1
         self.question = None
         self.cbb_file.addItems(os.listdir('./data'))
@@ -22,8 +23,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def onFilesChanged(self, name):
         self.load_papers(name)
+        self.current_question_num = 1
 
     def onPapersChanged(self, name):
+        self.getQuestion()
+        self.current_question_num = 1
+
+    def onQuestionTypeChanged(self, name):
+        self.current_question_num = 1
         self.getQuestion()
 
     def setQuestion(self, question):
@@ -32,14 +39,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cb_C.setChecked(False)
         self.cb_D.setChecked(False)
         self.lb_answer.setText('')
-        self.lb_title.setText(question['title'])
+        self.lb_title.setText(f"{self.current_question_num}/{self.getQuestionNum()}. {question['title']}")
         self.cb_A.setText(question['A'])
         self.cb_B.setText(question['B'])
         self.cb_C.setText(question['C'])
         self.cb_D.setText(question['D'])
 
-    def onQuestionTypeChanged(self, name):
-        self.getQuestion()
 
     def getQuestionNum(self):
         nums = self.papers.getQuestionNum(self.cbb_papers.currentText())
@@ -50,6 +55,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.question = self.papers.getQuestion(self.cbb_papers.currentText(), self.cbb_question_type.currentText(),
                                                     self.current_question_num)
             self.setQuestion(self.question)
+
+    def onJumpClicked(self):
+        try:
+            num = int(self.lineEdit.text())
+            if 0<num<=self.getQuestionNum():
+                self.current_question_num=num
+                self.getQuestion()
+        except:
+            traceback.print_exc()
 
     def checkAnswer(self):
         answer = []
@@ -64,10 +78,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return answer
 
     def onPreviousClicked(self):
-        self.current_question_num -= 1
-        if self.current_question_num < 1:
-            self.current_question_num = self.getQuestionNum()
-        self.getQuestion()
+        if self.current_question_num > 1:
+            self.current_question_num -= 1
+            self.getQuestion()
 
     def onSureClicked(self):
         if set(self.checkAnswer()) == set(self.question['answer']):
@@ -76,10 +89,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.lb_answer.setText('回答错误，正确答案是：' + ''.join(self.question['answer']))
 
     def onNextClicked(self):
-        self.current_question_num += 1
-        if self.current_question_num > self.getQuestionNum():
-            self.current_question_num = 1
-        self.getQuestion()
+        if self.current_question_num < self.getQuestionNum():
+            self.current_question_num += 1
+            self.getQuestion()
 
 
 if __name__ == "__main__":

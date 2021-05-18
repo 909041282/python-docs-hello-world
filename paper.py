@@ -88,17 +88,20 @@ class Papers:
         self.parserAnswer()
 
     def getQuestion(self, paper_name, type, num):
+        paper_name = paper_name.split('--')[0]
         if paper_name not in self.papers:
             raise ValueError(f'试卷 {paper_name} 不存在')
         return self.papers[paper_name].getQuestion(type, num)
 
     def getPaperName(self):
-        return sorted(list(self.papers.keys()))
+        return sorted([f'{i}--{self.getQuestionTitle(i)}'for i in self.papers])
 
     def getQuestionTitle(self, paper_name):
+        paper_name=paper_name.split('--')[0]
         return self.papers[paper_name].title
 
     def getQuestionNum(self, paper_name):
+        paper_name = paper_name.split('--')[0]
         return self.papers[paper_name].getQuestionNum()
 
     def parserQuestion(self):
