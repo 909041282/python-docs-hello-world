@@ -10,7 +10,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.setWindowTitle('刷题 v1.0')
+        self.setWindowTitle('刷题 v1.1')
         self.current_question_num = 1
         self.question = None
         self.cbb_file.addItems(os.listdir('./data'))

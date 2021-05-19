@@ -1,33 +1,5 @@
 import os
 import re
-import copy
-
-
-class Question:
-
-    def __init__(self, num):
-        self.number = num
-
-    def setQuestion(self, content):
-        data = content.split('\n')
-        if len(data) != 5:
-            raise ValueError('题目格式出错：' + content)
-        self.title = data[0]
-        self.answers = {
-            'A': data[1][2:],
-            'B': data[2][2:],
-            'C': data[3][2:],
-            'D': data[4][2:],
-        }
-
-    def setAnswer(self, answer):
-        self.ture_answers = answer
-
-    def getQuestionAndAnswer(self):
-        result = copy.deepcopy(self.answers)
-        result['title']=self.title
-        result['answer'] = self.ture_answers
-        return result
 
 
 class Paper:
@@ -40,25 +12,35 @@ class Paper:
     def getQuestion(self, type, num):
         if type not in self.questions and num not in self.questions[type]:
             raise ValueError(f'题型{type}，')
-        return self.questions[type][num].getQuestionAndAnswer()
+        return self.questions[type][num]
 
     def getQuestionNum(self):
         return {'单选': list(self.questions['单选'].keys()),
                 '多选': list(self.questions['多选'].keys())}
+
+    def paserQuestion(self,data):
+        data = data.split('\n')
+        if len(data) != 5:
+            raise ValueError('题目格式出错：' + data)
+        question ={"title":data[0],
+            'A': data[1][2:],
+            'B': data[2][2:],
+            'C': data[3][2:],
+            'D': data[4][2:],
+        }
+        return question
 
     def setQuestions(self, content):
         content = content.split('\n\n')
         single_part = re.split(r'\n(\d+)\.', content[0])[1:]
         for i in range(0, len(single_part), 2):
             number = int(single_part[i])
-            self.questions['单选'][number] = Question(number)
-            self.questions['单选'][number].setQuestion(single_part[i + 1])
+            self.questions['单选'][number] = self.paserQuestion(single_part[i + 1])
 
         mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
         for i in range(0, len(mutil_part), 2):
             number = int(mutil_part[i])
-            self.questions['多选'][number] = Question(number)
-            self.questions['多选'][number].setQuestion(mutil_part[i + 1])
+            self.questions['多选'][number] = self.paserQuestion(mutil_part[i + 1])
 
     def setAnswer(self, content):
         content = content.split('\n\n')
@@ -66,15 +48,13 @@ class Paper:
         for i in range(0, len(single_part), 2):
             number = int(single_part[i])
             answer = single_part[i + 1].split('\n')[1].split('|')
-            answer = [i[0] for i in answer]
-            self.questions['单选'][number].setAnswer(answer)
+            self.questions['单选'][number]['answer']= [i[0] for i in answer]
 
         mutil_part = re.split(r'\n(\d+)\.', content[1])[1:]
         for i in range(0, len(mutil_part), 2):
             number = int(mutil_part[i])
             answer = mutil_part[i + 1].split('\n')[1].split('|')
-            answer = [i[0] for i in answer]
-            self.questions['多选'][number].setAnswer(answer)
+            self.questions['多选'][number]['answer']= [i[0] for i in answer]
 
 
 class Papers:
